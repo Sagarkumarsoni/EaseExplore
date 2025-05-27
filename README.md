@@ -1,1 +1,2 @@
 # EaseExplore
+ExploreEase is a travel website designed for easy trip planning. Built with HTML, CSS, and JavaScript for a smooth user interface, and powered by Node.js. Express.js and MongoDB for efficient backend support, it helps users organize their travel plans effortlessly. The website also full hosted, allowing users to access it online anytime for seamless travel planning.
