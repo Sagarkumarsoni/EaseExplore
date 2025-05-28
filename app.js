@@ -1,14 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const Listing = require("./models/listing.js"); //we access the model and create a document
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const { listingSchema, reviewSchema } = require("./schema.js");
-const Review = require("./models/review.js");
+
+const listings = require("./routes/listing.js");
+const reviews = require("./routes/review.js");
 
 app.set("views", path.join(__dirname, "views"));//
 app.set("view engine", "ejs");//
@@ -35,104 +34,9 @@ app.get("/", (req, res) => {
     res.send("Hi, I am root");
 });
 
-const validateListing = (req, res, next) => {
-    let { error } = listingSchema.validate(req.body);
-    if(error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(400, errMsg);
-    } else {
-        next();
-    }
-};
+app.use("/listings", listings);
+app.use("/listings/:id/reviews", reviews);
 
-const validateReview = (req, res, next) => {
-    let { error } = reviewSchema.validate(req.body);
-    if(error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(400, errMsg);
-    } else {
-        next();
-    }
-};
-
-
-//Index Route
-app.get("/listings", wrapAsync(async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
-}));
-
-//New Route
-app.get("/listings/new", (req, res) => {
-    res.render("listings/new.ejs");
-})
-
-//Show Route
-app.get("/listings/:id", wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
-    res.render("listings/show.ejs", {listing});
-}));
-
-//Create Route
-app.post("/listings", validateListing, wrapAsync(async (req, res) => {
-    // let { title, description, image, price, location, country } = req.body;
-    // let newListing = new Listing({title, description, image, price, location, country});
-    // await newListing.save();
-    //     ***OR***
-        
-        const listing = req.body.listing; //request.body se listing object ko nikal rhe hai
-        const newListing = new Listing(listing);
-        // console.log(newListing);
-
-        await newListing.save();
-        res.redirect("/listings")
-}));
-
-//Edit Route -> it will serve a form
-app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    const listing = await Listing.findById(id);
-    res.render("listings/edit.ejs", { listing })
-}));
-
-//Update Route
-app.put("/listings/:id", validateListing, async (req, res) => {
-    let { id } = req.params;
-    await Listing.findByIdAndUpdate(id, {...req.body.listing});//req.body.listing is a js object which has different parameters and we deconstruct and convert into individual values and pass it to the new updated value
-    res.redirect(`/listings/${id}`);
-});
-
-//Delete Route
-app.delete("/listings/:id", wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    let deletedListings = await Listing.findByIdAndDelete(id);
-    console.log(deletedListings);
-    res.redirect("/listings");
-}));
-//Reviews
-//Post Reviwe Route
-app.post("/listings/:id/reviews", validateReview, wrapAsync(async(req, res) => {
-    let listing = await Listing.findById(req.params.id);//A Mongoose method that retrieves a document from the Listing collection by its _id.
-    let newReview = new Review(req.body.review);//This creates a new Review instance using the data from the request body.
-
-    listing.reviews.push(newReview);
-    await newReview.save();
-    await listing.save();
-
-    res.redirect(`/listings/${listing._id}`);
-
-}));
-
-//Delete Review Route
-app.post("/listings/:id/reviews/:reviewId", wrapAsync(async(req, res) => {
-    let { id, reviewId } = req.params;
-
-    await Listing.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
-    await Review.findByIdAndDelete(reviewId);
-
-    res.redirect(`/listings/${id}`)
-}));
 
 // app.get("/testListing", async (req, res) => { //since we have to parse data to the database so this is asynchronous function
 //     let sampleListing = new Listing({
