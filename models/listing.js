@@ -32,7 +32,11 @@ const listingSchema = new Schema({
             type: Schema.Types.ObjectId,//all the objectId from the review is stored inside this array
             ref: "Review"
         }
-    ]
+    ],
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
 });
 
 listingSchema.post("findOneAndDelete", async(listing) => {

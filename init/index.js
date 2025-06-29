@@ -20,6 +20,7 @@ async function main() {//async function that connects MongoDB database using Mon
 
 const initDB = async() => {
     await Listing.deleteMany({});
+    initData.data = initData.data.map((obj) => ({...obj, owner: "684657e9d173769ef8f50390"}))
     await Listing.insertMany(initData.data);//in initData-> data gets accessed and inserted in Listing
     console.log("data was initialized");
 };
