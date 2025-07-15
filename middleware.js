@@ -7,7 +7,12 @@ module.exports.isLoggedIn = (req, res, next) => {
     console.log(req.path, "..", req.originalUrl);
     if(!req.isAuthenticated()) {
         //requestUrl save
-        req.session.redirectUrl = req.originalUrl;
+        if(req.originalUrl.includes("/reviews/")) {
+            // If URL is review delete or edit route, redirect to parent listing page instead
+            req.session.redirectUrl = req.originalUrl.split("/reviews")[0];
+        } else {
+            req.session.redirectUrl = req.originalUrl;
+        }
         req.flash("error", "You must be logged in to create listing!");
         res.redirect("/login");
     } else {
