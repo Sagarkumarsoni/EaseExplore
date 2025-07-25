@@ -110,3 +110,8 @@ body {
 /* .show-card {
     padding-left: 0 !important;
 } */
+
+#map { 
+    height: 350px;
+    width: 80vh;
+}

@@ -1,11 +1,15 @@
 <% layout("/layouts/boilerplate") %>
+<script>
+    const mapToken = "<%= process.env.MAP_TOKEN %>";
+    const listing = <%- JSON.stringify(listing) %>;
+</script>
     <div class="row mt-3"> <!-- mt means margin from top  -->
         <div class="col-8 offset-3 ">
         <h3><b><%= listing.title %></h3>
     </div>
     <div class="row">
         <div class="card col-6 offset-3 show-card listing-card">
-            <img src="<%= listing.image %>" class="card-img-top" alt="listing_image" style="height: 14rem">
+            <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 14rem">
             <div class="card-body">
                 <p class="card-text ">Owned by <b><i><%= listing.owner.username %></i></b></p>
                 <p class="card-text"></p><%= listing.description %><br></p>
@@ -28,8 +32,9 @@
 <% } %>
 
 <div class="col-8 offset-3">
-    <hr>
+    
     <% if(currUser) { %>
+        <hr>
         <h4>Leave a Review</h4>
         <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
             <!-- <div class="mb-3 mt-3">
@@ -62,8 +67,9 @@
     <% } %>
     <hr>
 
-    <p><b>All Reviews</b></p>
+    <% if(listing.reviews.length > 0) { %>
     <div class="row">
+        <p><b>All Reviews</b></p>
         <% for(review of listing.reviews) { %>
             <div class="card col-5 mb-3 ms-3">
                 <div class="card-body">
@@ -79,5 +85,11 @@
             
         <% } %>
     </div>
+    <% } %>
 </div>
+    <div class="col-8 offset-3">
+        <h3 style="font-weight:initial;">Where you'll be</h3>
+        <div id="map"></div>
+    </div>
 <br>
+<script src="/js/map.js"></script>
