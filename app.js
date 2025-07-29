@@ -1,14 +1,16 @@
+//Load environment variables from .env file in delvelopment
 if(process.env.NODE_ENV != "production") {
     require('dotenv').config();
 }
 
-
+// Import core dependencies
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+// Initialize Express App
+const app = express();
 const ExpressError = require("./utils/ExpressError.js");
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
